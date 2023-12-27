@@ -1,2 +1,2 @@
-[submodule "themes/apollo"]
+[submodule "themes/zola-apollo"]
 	url = git@github.com:harish-coeff/zola-apollo.git
