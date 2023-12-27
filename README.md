@@ -1,9 +1,8 @@
 
 # 65535
 
-<header>
+
 Personal Blog
-</header>
 
 ## Day 0
 
