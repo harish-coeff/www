@@ -2,7 +2,7 @@
 title = "Hello World!"
 date = "2023-12-28"
 [taxonomies]
-tags=["blog"]
+tags=["#blog"]
 +++
 
 ## Say hi!
