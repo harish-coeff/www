@@ -34,6 +34,13 @@ Outside of work, you'll find me:
 - 🏎️ Watching F1 races and analyzing team strategies.
 - 🍺 socializing with a cold one!
 
+## 📘 What I'm Doing Now
+
+_As of 2023-12-28, here's what I'm currently focused on:_
+- 📖 Reading "Clear Thinking" by Shane Parrish to sharpen my decision-making and thought processes.
+- 🚀 Starting my journey with ZigLang and systems programming, diving into the intricacies of lower-level computing.
+- ✍️ Embracing the hobby of blogging to share insights, ideas, and experiences – a personal endeavor to express and connect.
+
 ## 📬 Contact
 
 Got a tech idea or want to discuss F1 strategies?
