@@ -12,6 +12,7 @@ highlight_code = true
 highlight_theme = "ayu-dark"
 
 [extra]
+toc = true
 use_cdn = false
 theme = "toggle"
 favicon = "/icon/favicon.ico"
