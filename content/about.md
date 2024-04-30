@@ -33,6 +33,7 @@ Outside of work, you'll find me:
 - 🏋️‍♂️ Training at the gym, pushing my limits.
 - 🏎️ Watching F1 races and analyzing team strategies.
 - 🍺 socializing with a cold one!
+- 🎲 playing strategy board games.
 
 ## 📘 What I'm Doing Now
 
