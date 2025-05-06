@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ShapeShift Runner</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
@@ -15,12 +15,17 @@
             background-color: #2c2c2c; /* Darker gray for body */
             font-family: 'Press Start 2P', monospace;
             color: white;
+            overflow: hidden; /* Prevent scrolling on mobile */
         }
         canvas {
             background-color: #000000; /* Solid dark background for canvas */
             display: block;
             border: 3px solid #ffffff;
             box-shadow: 0 0 15px rgba(255,255,255,0.5);
+            cursor: pointer; /* Indicate canvas is interactive */
+            max-width: 100%; /* Ensure canvas scales down on small screens */
+            max-height: 100vh; /* Allow canvas to take full height if needed */
+            object-fit: contain; /* Maintain aspect ratio if scaling */
         }
     </style>
 </head>
@@ -43,9 +48,10 @@
         const PLAYER_SIZE = 50; // Characteristic size (diameter, side length)
         const WALL_WIDTH = 80; // Width of the walls
         const SHAPES = ['circle', 'square', 'triangle'];
+        let currentShapeIndex = 0; // To cycle through shapes
 
         // --- Game State Variables ---
-        let playerShape; // Current shape of the player: 'circle', 'square', 'triangle'
+        let playerShape; // Current shape of the player
         let walls; // Array to store wall objects { x, holeShape, scored }
         let wallSpeed; // Current speed of walls in pixels/second
         let spawnInterval; // Current interval between wall spawns in seconds
@@ -59,13 +65,15 @@
         // --- Initialization ---
         function init() {
             // Event Listeners for player controls
-            window.addEventListener('keydown', handleInput);
+            window.addEventListener('keydown', handleKeyboardInput);
+            canvas.addEventListener('click', handleCanvasTap); // For mouse clicks and touch taps
             resetGame();
         }
 
         // --- Reset Game State ---
         function resetGame() {
-            playerShape = 'circle'; // Default shape
+            currentShapeIndex = 0; // Reset to circle
+            playerShape = SHAPES[currentShapeIndex];
             walls = [];
             score = 0;
             elapsedSec = 0;
@@ -81,8 +89,8 @@
             gameLoop(lastTime);
         }
 
-        // --- Input Handling ---
-        function handleInput(e) {
+        // --- Keyboard Input Handling ---
+        function handleKeyboardInput(e) {
             if (gameOver) {
                 if (e.key === 'r' || e.key === 'R') {
                     resetGame();
@@ -92,10 +100,24 @@
 
             if (e.key === '1') {
                 playerShape = 'circle';
+                currentShapeIndex = SHAPES.indexOf('circle');
             } else if (e.key === '2') {
                 playerShape = 'square';
+                currentShapeIndex = SHAPES.indexOf('square');
             } else if (e.key === '3') {
                 playerShape = 'triangle';
+                currentShapeIndex = SHAPES.indexOf('triangle');
+            }
+        }
+
+        // --- Canvas Tap Handling (for mobile and mouse) ---
+        function handleCanvasTap() {
+            if (gameOver) {
+                resetGame();
+            } else {
+                // Cycle to the next shape
+                currentShapeIndex = (currentShapeIndex + 1) % SHAPES.length;
+                playerShape = SHAPES[currentShapeIndex];
             }
         }
 
@@ -144,17 +166,13 @@
                 const playerLeft = PLAYER_X - PLAYER_SIZE / 2;
                 const playerRight = PLAYER_X + PLAYER_SIZE / 2;
 
-                // The wall's swept X-interval for this frame is from its new left edge to its old right edge
-                const wallSweptLeft = wall.x; // New left edge of the wall
-                const wallSweptRight = wallOldX + WALL_WIDTH; // Old right edge of the wall
+                const wallSweptLeft = wall.x;
+                const wallSweptRight = wallOldX + WALL_WIDTH;
 
-                // Check if player's X-interval overlaps with the wall's swept X-interval
                 if (playerRight > wallSweptLeft && playerLeft < wallSweptRight) {
-                    // X-axis overlap with the swept path detected.
-                    // Collision occurs if player's shape does not match the wall's hole shape.
                     if (playerShape !== wall.holeShape) {
                         gameOver = true;
-                        return; // Exit update loop immediately on game over
+                        return;
                     }
                 }
 
@@ -166,41 +184,36 @@
         }
 
         // --- Drawing Functions ---
-
-        // Draw Player Avatar
         function drawPlayer(ctx) {
             ctx.fillStyle = '#00FF00'; // Bright green for player
             ctx.beginPath();
-            const S = PLAYER_SIZE; // Side length or diameter
+            const S = PLAYER_SIZE;
 
             if (playerShape === 'circle') {
                 ctx.arc(PLAYER_X, PLAYER_Y, S / 2, 0, Math.PI * 2);
             } else if (playerShape === 'square') {
                 ctx.rect(PLAYER_X - S / 2, PLAYER_Y - S / 2, S, S);
             } else if (playerShape === 'triangle') {
-                const h = (Math.sqrt(3) / 2) * S; // Height of equilateral triangle
-                ctx.moveTo(PLAYER_X, PLAYER_Y - (2/3) * h); // Top point
-                ctx.lineTo(PLAYER_X - S / 2, PLAYER_Y + (1/3) * h); // Bottom-left
-                ctx.lineTo(PLAYER_X + S / 2, PLAYER_Y + (1/3) * h); // Bottom-right
+                const h = (Math.sqrt(3) / 2) * S;
+                ctx.moveTo(PLAYER_X, PLAYER_Y - (2/3) * h);
+                ctx.lineTo(PLAYER_X - S / 2, PLAYER_Y + (1/3) * h);
+                ctx.lineTo(PLAYER_X + S / 2, PLAYER_Y + (1/3) * h);
             }
             ctx.closePath();
             ctx.fill();
         }
 
-        // Draw a Single Wall
         function drawWall(ctx, wall) {
-            // Draw the solid part of the wall
-            ctx.fillStyle = '#888888'; // Medium gray for walls
+            ctx.fillStyle = '#888888';
             ctx.fillRect(wall.x, 0, WALL_WIDTH, CANVAS_HEIGHT);
 
-            // Draw the hole in the wall using globalCompositeOperation
             ctx.save();
-            ctx.globalCompositeOperation = 'destination-out'; // This makes subsequent drawings "cut out"
+            ctx.globalCompositeOperation = 'destination-out';
             
             ctx.beginPath();
-            const holeX = wall.x + WALL_WIDTH / 2; // Center of the hole
-            const holeY = PLAYER_Y; // Hole is always at player's Y level
-            const S = PLAYER_SIZE; // Size of the hole matches player size
+            const holeX = wall.x + WALL_WIDTH / 2;
+            const holeY = PLAYER_Y;
+            const S = PLAYER_SIZE;
 
             if (wall.holeShape === 'circle') {
                 ctx.arc(holeX, holeY, S / 2, 0, Math.PI * 2);
@@ -214,38 +227,30 @@
             }
             ctx.closePath();
             ctx.fill();
-            
-            ctx.restore(); // Restore original composite operation
+            ctx.restore();
         }
 
-        // Draw All Game Elements
         function draw(ctx) {
-            // Clear canvas
-            ctx.fillStyle = '#000000'; // Canvas background color
+            ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-            // Draw player
             drawPlayer(ctx);
-
-            // Draw walls
             walls.forEach(wall => drawWall(ctx, wall));
 
-            // Draw Score
             ctx.fillStyle = 'white';
             ctx.font = '24px "Press Start 2P"';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillText('Score: ' + score, 20, 20);
 
-            // Draw Instructions
             ctx.font = '16px "Press Start 2P"';
             ctx.textAlign = 'right';
-            ctx.fillText('1=Circle 2=Square 3=Triangle', CANVAS_WIDTH - 20, 20);
+            // Updated instructions for tap
+            ctx.fillText('Tap to Change / 1,2,3 Keys', CANVAS_WIDTH - 20, 20);
 
 
-            // Draw Game Over Screen
             if (gameOver) {
-                ctx.fillStyle = 'rgba(0, 0, 0, 0.75)'; // Semi-transparent overlay
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
                 ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
                 ctx.fillStyle = 'white';
@@ -259,19 +264,20 @@
                 ctx.fillText('Final Score: ' + score, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
 
                 ctx.font = '24px "Press Start 2P"';
-                ctx.fillText('Press R to Restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
+                // Updated restart instruction
+                ctx.fillText('Tap or Press R to Restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
             }
         }
 
         // --- Main Game Loop ---
         function gameLoop(timestamp) {
-            const dt = (timestamp - lastTime) / 1000; // Delta time in seconds
+            const dt = (timestamp - lastTime) / 1000;
             lastTime = timestamp;
 
             if (!gameOver) {
                 update(dt);
             }
-            draw(ctx); // Always draw, even if game over, to show the final screen
+            draw(ctx);
 
             if (!gameOver) {
                 animationFrameId = requestAnimationFrame(gameLoop);
