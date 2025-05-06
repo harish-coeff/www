@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ShapeShift Runner</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
     <style>
         body {
             margin: 0;
@@ -43,43 +44,81 @@
         canvas.height = CANVAS_HEIGHT;
 
         // --- Game Constants ---
-        const PLAYER_X = 100; // Player's fixed X position
-        const PLAYER_Y = CANVAS_HEIGHT / 2; // Player's fixed Y position (vertical center)
-        const PLAYER_SIZE = 50; // Characteristic size (diameter, side length)
-        const WALL_WIDTH = 80; // Width of the walls
+        const PLAYER_X = 100;
+        const PLAYER_Y = CANVAS_HEIGHT / 2;
+        const PLAYER_SIZE = 50;
+        const WALL_WIDTH = 80;
         const SHAPES = ['circle', 'square', 'triangle'];
-        let currentShapeIndex = 0; // To cycle through shapes
+        let currentShapeIndex = 0;
 
         // --- Game State Variables ---
-        let playerShape; // Current shape of the player
-        let walls; // Array to store wall objects { x, holeShape, scored }
-        let wallSpeed; // Current speed of walls in pixels/second
-        let spawnInterval; // Current interval between wall spawns in seconds
+        let playerShape;
+        let walls;
+        let wallSpeed;
+        let spawnInterval;
         let timeSinceLastSpawn;
         let score;
-        let elapsedSec; // Total elapsed time for difficulty scaling
+        let elapsedSec;
         let gameOver;
         let animationFrameId;
-        let lastTime; // For delta time calculation
+        let lastTime;
+        let audioStarted = false; // Flag to check if Tone.js has been started
+
+        // --- Sound Synthesis (Tone.js) ---
+        let shapeChangeSynth, scoreSynth, gameOverSynth;
+
+        function setupSounds() {
+            // Synth for shape change - a short, sharp click
+            shapeChangeSynth = new Tone.Synth({
+                oscillator: { type: 'triangle' },
+                envelope: { attack: 0.005, decay: 0.1, sustain: 0.01, release: 0.1 }
+            }).toDestination();
+
+            // Synth for scoring - a positive, slightly rising tone
+            scoreSynth = new Tone.Synth({
+                oscillator: { type: 'sine' },
+                envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.2 }
+            }).toDestination();
+
+            // Synth for game over - a lower, somewhat dissonant tone
+            gameOverSynth = new Tone.NoiseSynth({
+                noise: { type: 'pink' },
+                envelope: { attack: 0.01, decay: 0.5, sustain: 0, release: 0.3 }
+            }).toDestination();
+            gameOverSynth.volume.value = -6; // Reduce volume for noise synth
+        }
+        
+        // Function to start audio context (must be called after user interaction)
+        async function startAudio() {
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
+                console.log('Audio context started');
+            }
+            audioStarted = true;
+            if (!shapeChangeSynth) { // Setup synths only once audio context is ready
+                 setupSounds();
+            }
+        }
+
 
         // --- Initialization ---
         function init() {
-            // Event Listeners for player controls
             window.addEventListener('keydown', handleKeyboardInput);
-            canvas.addEventListener('click', handleCanvasTap); // For mouse clicks and touch taps
+            canvas.addEventListener('click', handleCanvasTap);
+            // Sounds will be set up on first interaction
             resetGame();
         }
 
         // --- Reset Game State ---
         function resetGame() {
-            currentShapeIndex = 0; // Reset to circle
+            currentShapeIndex = 0;
             playerShape = SHAPES[currentShapeIndex];
             walls = [];
             score = 0;
             elapsedSec = 0;
-            wallSpeed = 200; // Initial wall speed
-            spawnInterval = 1.5; // Initial spawn interval
-            timeSinceLastSpawn = spawnInterval; // Spawn first wall quickly
+            wallSpeed = 200;
+            spawnInterval = 1.5;
+            timeSinceLastSpawn = spawnInterval;
             gameOver = false;
 
             if (animationFrameId) {
@@ -90,7 +129,9 @@
         }
 
         // --- Keyboard Input Handling ---
-        function handleKeyboardInput(e) {
+        async function handleKeyboardInput(e) {
+            if (!audioStarted) await startAudio(); // Start audio on first key press
+
             if (gameOver) {
                 if (e.key === 'r' || e.key === 'R') {
                     resetGame();
@@ -98,26 +139,38 @@
                 return;
             }
 
-            if (e.key === '1') {
+            let shapeChanged = false;
+            if (e.key === '1' && playerShape !== 'circle') {
                 playerShape = 'circle';
                 currentShapeIndex = SHAPES.indexOf('circle');
-            } else if (e.key === '2') {
+                shapeChanged = true;
+            } else if (e.key === '2' && playerShape !== 'square') {
                 playerShape = 'square';
                 currentShapeIndex = SHAPES.indexOf('square');
-            } else if (e.key === '3') {
+                shapeChanged = true;
+            } else if (e.key === '3' && playerShape !== 'triangle') {
                 playerShape = 'triangle';
                 currentShapeIndex = SHAPES.indexOf('triangle');
+                shapeChanged = true;
+            }
+
+            if (shapeChanged && shapeChangeSynth) {
+                shapeChangeSynth.triggerAttackRelease('C5', '8n');
             }
         }
 
-        // --- Canvas Tap Handling (for mobile and mouse) ---
-        function handleCanvasTap() {
+        // --- Canvas Tap Handling ---
+        async function handleCanvasTap() {
+            if (!audioStarted) await startAudio(); // Start audio on first tap
+
             if (gameOver) {
                 resetGame();
             } else {
-                // Cycle to the next shape
                 currentShapeIndex = (currentShapeIndex + 1) % SHAPES.length;
                 playerShape = SHAPES[currentShapeIndex];
+                if (shapeChangeSynth) {
+                    shapeChangeSynth.triggerAttackRelease('C5', '8n');
+                }
             }
         }
 
@@ -126,57 +179,54 @@
             const randomShapeIndex = Math.floor(Math.random() * SHAPES.length);
             const holeShape = SHAPES[randomShapeIndex];
             walls.push({
-                x: CANVAS_WIDTH, // Spawn at the right edge of the canvas
+                x: CANVAS_WIDTH,
                 holeShape: holeShape,
                 scored: false
             });
         }
 
-        // --- Update Game Logic (called each frame) ---
+        // --- Update Game Logic ---
         function update(dt) {
             if (gameOver) return;
 
             elapsedSec += dt;
-
-            // Continuous difficulty increase
             wallSpeed = 200 + 20 * elapsedSec;
             spawnInterval = Math.max(1.5 - 0.02 * elapsedSec, 0.4);
 
-            // Spawn new walls
             timeSinceLastSpawn += dt;
             if (timeSinceLastSpawn >= spawnInterval) {
                 spawnWall();
                 timeSinceLastSpawn = 0;
             }
 
-            // Move walls and check for collisions/scoring
             for (let i = walls.length - 1; i >= 0; i--) {
                 const wall = walls[i];
-                const wallOldX = wall.x; // Wall's x position BEFORE this frame's movement
+                const wallOldX = wall.x;
+                wall.x -= wallSpeed * dt;
 
-                wall.x -= wallSpeed * dt; // Update wall's x position (new position)
-
-                // Scoring: Increment score when wall's right edge passes player's X position
                 if (!wall.scored && (wall.x + WALL_WIDTH) < PLAYER_X) {
                     score++;
                     wall.scored = true;
+                    if (scoreSynth) {
+                        scoreSynth.triggerAttackRelease('E5', '8n', Tone.now(), 0.8); // Play score sound
+                    }
                 }
 
-                // Collision Detection (using swept area)
                 const playerLeft = PLAYER_X - PLAYER_SIZE / 2;
                 const playerRight = PLAYER_X + PLAYER_SIZE / 2;
-
                 const wallSweptLeft = wall.x;
                 const wallSweptRight = wallOldX + WALL_WIDTH;
 
                 if (playerRight > wallSweptLeft && playerLeft < wallSweptRight) {
                     if (playerShape !== wall.holeShape) {
                         gameOver = true;
+                        if (gameOverSynth) {
+                            gameOverSynth.triggerAttackRelease('16n'); // Play game over sound
+                        }
                         return;
                     }
                 }
 
-                // Remove off-screen walls
                 if (wall.x + WALL_WIDTH < 0) {
                     walls.splice(i, 1);
                 }
@@ -185,10 +235,9 @@
 
         // --- Drawing Functions ---
         function drawPlayer(ctx) {
-            ctx.fillStyle = '#00FF00'; // Bright green for player
+            ctx.fillStyle = '#00FF00';
             ctx.beginPath();
             const S = PLAYER_SIZE;
-
             if (playerShape === 'circle') {
                 ctx.arc(PLAYER_X, PLAYER_Y, S / 2, 0, Math.PI * 2);
             } else if (playerShape === 'square') {
@@ -206,15 +255,12 @@
         function drawWall(ctx, wall) {
             ctx.fillStyle = '#888888';
             ctx.fillRect(wall.x, 0, WALL_WIDTH, CANVAS_HEIGHT);
-
             ctx.save();
             ctx.globalCompositeOperation = 'destination-out';
-            
             ctx.beginPath();
             const holeX = wall.x + WALL_WIDTH / 2;
             const holeY = PLAYER_Y;
             const S = PLAYER_SIZE;
-
             if (wall.holeShape === 'circle') {
                 ctx.arc(holeX, holeY, S / 2, 0, Math.PI * 2);
             } else if (wall.holeShape === 'square') {
@@ -233,38 +279,28 @@
         function draw(ctx) {
             ctx.fillStyle = '#000000';
             ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
             drawPlayer(ctx);
             walls.forEach(wall => drawWall(ctx, wall));
-
             ctx.fillStyle = 'white';
             ctx.font = '24px "Press Start 2P"';
             ctx.textAlign = 'left';
             ctx.textBaseline = 'top';
             ctx.fillText('Score: ' + score, 20, 20);
-
             ctx.font = '16px "Press Start 2P"';
             ctx.textAlign = 'right';
-            // Restored detailed key mapping alongside tap instruction
             ctx.fillText('Tap | 1:Circle 2:Square 3:Triangle', CANVAS_WIDTH - 20, 20);
-
 
             if (gameOver) {
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
                 ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
                 ctx.fillStyle = 'white';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-
                 ctx.font = '48px "Press Start 2P"';
                 ctx.fillText('GAME OVER', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 - 60);
-
                 ctx.font = '32px "Press Start 2P"';
                 ctx.fillText('Final Score: ' + score, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
-
                 ctx.font = '24px "Press Start 2P"';
-                // Updated restart instruction
                 ctx.fillText('Tap or Press R to Restart', CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 60);
             }
         }
@@ -273,12 +309,10 @@
         function gameLoop(timestamp) {
             const dt = (timestamp - lastTime) / 1000;
             lastTime = timestamp;
-
             if (!gameOver) {
                 update(dt);
             }
             draw(ctx);
-
             if (!gameOver) {
                 animationFrameId = requestAnimationFrame(gameLoop);
             }
