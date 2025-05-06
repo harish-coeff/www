@@ -1,7 +1,7 @@
 base_url = "https://www.65535.io"
 title = "65535"
 build_search_index = true
-generate_feed = true
+generate_feeds = true
 minify_html = true
 taxonomies = [{ name = "tags" }]
 
