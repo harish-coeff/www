@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+        <loc>https://www.65535.io/</loc>
+    </url>
+    <url>
+        <loc>https://www.65535.io/about/</loc>
+    </url>
+    <url>
+        <loc>https://www.65535.io/posts/</loc>
+    </url>
+    <url>
+        <loc>https://www.65535.io/posts/hello-world/</loc>
+        <lastmod>2023-12-28</lastmod>
+    </url>
+    <url>
+        <loc>https://www.65535.io/posts/page/1/</loc>
+    </url>
+    <url>
+        <loc>https://www.65535.io/posts/systems-performance/</loc>
+        <lastmod>2024-06-06</lastmod>
+    </url>
+    <url>
+        <loc>https://www.65535.io/projects/</loc>
+    </url>
+    <url>
+        <loc>https://www.65535.io/projects/project-1/</loc>
+    </url>
+    <url>
+        <loc>https://www.65535.io/tags/</loc>
+    </url>
+    <url>
+        <loc>https://www.65535.io/tags/blog/</loc>
+    </url>
+</urlset>
