@@ -130,7 +130,9 @@
             // Move walls and check for collisions/scoring
             for (let i = walls.length - 1; i >= 0; i--) {
                 const wall = walls[i];
-                wall.x -= wallSpeed * dt;
+                const wallOldX = wall.x; // Wall's x position BEFORE this frame's movement
+
+                wall.x -= wallSpeed * dt; // Update wall's x position (new position)
 
                 // Scoring: Increment score when wall's right edge passes player's X position
                 if (!wall.scored && (wall.x + WALL_WIDTH) < PLAYER_X) {
@@ -138,16 +140,17 @@
                     wall.scored = true;
                 }
 
-                // Collision Detection
-                // Player's X-range: PLAYER_X - PLAYER_SIZE/2 to PLAYER_X + PLAYER_SIZE/2
-                // Wall's X-range: wall.x to wall.x + WALL_WIDTH
+                // Collision Detection (using swept area)
                 const playerLeft = PLAYER_X - PLAYER_SIZE / 2;
                 const playerRight = PLAYER_X + PLAYER_SIZE / 2;
-                const wallLeft = wall.x;
-                const wallRight = wall.x + WALL_WIDTH;
 
-                if (playerRight > wallLeft && playerLeft < wallRight) {
-                    // X-axis overlap detected. Player is at the height of the hole by design.
+                // The wall's swept X-interval for this frame is from its new left edge to its old right edge
+                const wallSweptLeft = wall.x; // New left edge of the wall
+                const wallSweptRight = wallOldX + WALL_WIDTH; // Old right edge of the wall
+
+                // Check if player's X-interval overlaps with the wall's swept X-interval
+                if (playerRight > wallSweptLeft && playerLeft < wallSweptRight) {
+                    // X-axis overlap with the swept path detected.
                     // Collision occurs if player's shape does not match the wall's hole shape.
                     if (playerShape !== wall.holeShape) {
                         gameOver = true;
