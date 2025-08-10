@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+    <title>65535</title>
+    <link rel="self" type="application/atom+xml" href="https://www.65535.io/atom.xml"/>
+    <link rel="alternate" type="text/html" href="https://www.65535.io"/>
+    <generator uri="https://www.getzola.org/">Zola</generator>
+    <updated>2024-06-06T00:00:00+00:00</updated>
+    <id>https://www.65535.io/atom.xml</id>
+    <entry xml:lang="en">
+        <title>Systems Performance: Init - 01</title>
+        <published>2024-06-06T00:00:00+00:00</published>
+        <updated>2024-06-06T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://www.65535.io/posts/systems-performance/"/>
+        <id>https://www.65535.io/posts/systems-performance/</id>
+        
+        <content type="html" xml:base="https://www.65535.io/posts/systems-performance/">&lt;h2 id=&quot;starting-the-book-systems-performance&quot;&gt;Starting the book Systems Performance&lt;&#x2F;h2&gt;
+&lt;h3 id=&quot;goal&quot;&gt;Goal&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;To gain practical knowledge of&lt;&#x2F;p&gt;
+&lt;ul&gt;
+&lt;li&gt;Operating Systems&lt;&#x2F;li&gt;
+&lt;li&gt;File Systems&lt;&#x2F;li&gt;
+&lt;li&gt;How memory works&lt;&#x2F;li&gt;
+&lt;li&gt;How the CPU works&lt;&#x2F;li&gt;
+&lt;li&gt;Networks and more...&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;h3 id=&quot;methodology&quot;&gt;Methodology&lt;&#x2F;h3&gt;
+&lt;ul&gt;
+&lt;li&gt;Read one chapter per week and discuss with others on what I&#x27;ve understood, what I&#x27;ve learned that was new, and what doubts I still have.&lt;&#x2F;li&gt;
+&lt;li&gt;Make Notes along the way of important topics.&lt;&#x2F;li&gt;
+&lt;li&gt;Learn markdown format, maybe explore obsidian for knowledge retrieval.&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;hr &#x2F;&gt;
+&lt;h1 id=&quot;get-to-it&quot;&gt;GET TO IT!&lt;&#x2F;h1&gt;
+</content>
+        
+    </entry>
+    <entry xml:lang="en">
+        <title>Hello World!</title>
+        <published>2023-12-28T00:00:00+00:00</published>
+        <updated>2023-12-28T00:00:00+00:00</updated>
+        
+        <author>
+          <name>
+            
+              Unknown
+            
+          </name>
+        </author>
+        
+        <link rel="alternate" type="text/html" href="https://www.65535.io/posts/hello-world/"/>
+        <id>https://www.65535.io/posts/hello-world/</id>
+        
+        <content type="html" xml:base="https://www.65535.io/posts/hello-world/">&lt;h2 id=&quot;say-hi&quot;&gt;Say hi!&lt;&#x2F;h2&gt;
+&lt;pre data-lang=&quot;zig&quot; style=&quot;background-color:#0f1419;color:#bfbab0;&quot; class=&quot;language-zig &quot;&gt;&lt;code class=&quot;language-zig&quot; data-lang=&quot;zig&quot;&gt;&lt;span style=&quot;color:#ff7733;&quot;&gt;const&lt;&#x2F;span&gt;&lt;span&gt; std &lt;&#x2F;span&gt;&lt;span style=&quot;color:#f29668;&quot;&gt;= &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff7733;&quot;&gt;@import&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c2d94c;&quot;&gt;&amp;quot;std&amp;quot;&lt;&#x2F;span&gt;&lt;span&gt;)&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bfbab0cc;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff7733;&quot;&gt;pub fn &lt;&#x2F;span&gt;&lt;span style=&quot;color:#ffb454;&quot;&gt;main&lt;&#x2F;span&gt;&lt;span&gt;() &lt;&#x2F;span&gt;&lt;span style=&quot;color:#f29668;&quot;&gt;!&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ff7733;&quot;&gt;void &lt;&#x2F;span&gt;&lt;span&gt;{
+&lt;&#x2F;span&gt;&lt;span&gt;    std.debug.&lt;&#x2F;span&gt;&lt;span style=&quot;color:#ffb454;&quot;&gt;print&lt;&#x2F;span&gt;&lt;span&gt;(&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c2d94c;&quot;&gt;&amp;quot;Hello, World!&lt;&#x2F;span&gt;&lt;span style=&quot;color:#95e6cb;&quot;&gt;\n&lt;&#x2F;span&gt;&lt;span style=&quot;color:#c2d94c;&quot;&gt;&amp;quot;&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bfbab0cc;&quot;&gt;,&lt;&#x2F;span&gt;&lt;span&gt; .{})&lt;&#x2F;span&gt;&lt;span style=&quot;color:#bfbab0cc;&quot;&gt;;
+&lt;&#x2F;span&gt;&lt;span&gt;}
+&lt;&#x2F;span&gt;&lt;&#x2F;code&gt;&lt;&#x2F;pre&gt;
+&lt;h2 id=&quot;quote&quot;&gt;Quote&lt;&#x2F;h2&gt;
+&lt;blockquote&gt;
+&lt;p&gt;A language that doesn’t affect the way you think about programming is not worth knowing.&lt;&#x2F;p&gt;
+&lt;&#x2F;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;Alan J. Perlis, 1982&lt;&#x2F;li&gt;
+&lt;&#x2F;ul&gt;
+&lt;hr &#x2F;&gt;
+</content>
+        
+    </entry>
+</feed>
